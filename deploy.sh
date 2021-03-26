@@ -44,9 +44,11 @@ fi
 environment=$1
 option=$2
 
+AWS_ACCOUNT=${AWS_ACCOUNT:-$(aws sts get-caller-identity --output text | awk '{print $1}')}
+
 macros_s3objects_stack="ctdemo-cf-macros-s3objects"
 macros_cloudtruth_stack="ctdemo-cf-macros-cloudtruth"
-templates_bucket="ctdemo-cf-templates"
+templates_bucket="ctdemo-cf-templates-${AWS_ACCOUNT}"
 website_stack="ctdemo-cf-${environment}-${option}-website"
 website_template="website-${option}.template"
 

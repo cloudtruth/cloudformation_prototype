@@ -19,7 +19,7 @@ Resources:
   HelloBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !FindInMap [ Configuration, !Ref Environment, BucketName ]
+      BucketName: !Join ["-", [!FindInMap [ Configuration, !Ref Environment, BucketName ], !Ref AWS::AccountId]]
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
