@@ -1,0 +1,64 @@
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  CloudTruthMacroFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: ruby2.7
+      CodeUri: ./cloudtruth
+      Handler: macro_handler.cloudtruth_cf_macro
+      Timeout: 30
+      Environment:
+        Variables:
+          CT_API_KEY: "{{resolve:ssm:/ct_api_key:1}}"
+
+  CloudTruthMacroSyncFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: ruby2.7
+      CodeUri: ./cloudtruth
+      Handler: macro_sync_handler.cloudtruth_cf_macro_sync
+      Timeout: 30
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:DescribeParameters"
+                - "ssm:GetParameters"
+                - "ssm:PutParameter"
+              Resource: '*'
+      Environment:
+        Variables:
+          CT_API_KEY: "{{resolve:ssm:/ct_api_key:1}}"
+
+  CloudTruthResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: ruby2.7
+      CodeUri: ./cloudtruth
+      Handler: resource_handler.cloudtruth_cf_resource_handler
+      Timeout: 30
+      Environment:
+        Variables:
+          CT_API_KEY: "{{resolve:ssm:/ct_api_key:1}}"
+
+  CloudTruthMacro:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: CloudTruth
+      FunctionName: !GetAtt CloudTruthMacroFunction.Arn
+
+  CloudTruthMacroSync:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: CloudTruthSync
+      FunctionName: !GetAtt CloudTruthMacroSyncFunction.Arn
+
+Outputs:
+  CloudTruthResourceFunction:
+    Description: The arn for the cloudtruth custom resource lambda
+    Value: !GetAtt CloudTruthResourceFunction.Arn
+    Export:
+      Name: "CloudTruthResourceFunction"

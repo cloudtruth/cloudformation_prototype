@@ -1,0 +1,41 @@
+Transform:
+  - S3Objects
+  - CloudTruth
+
+# The CloudTruth macro will try to get its configuration in order from
+# Template:Parameters -> Fn:Transform:Properties -> ENV, so we can use it at
+# either global scope or through Fn::Transform
+
+Parameters:
+  Environment:
+    Description: CloudTruth Environment
+    Type: String
+  ParameterFilter:
+    Description: CloudTruth parameter lookup filter (optional)
+    Type: String
+    Default: cfdemo
+
+Resources:
+
+  HelloBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "{{cfdemo.bucket}}-3"
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  HelloBucketIndex:
+    Type: AWS::S3::Object
+    Properties:
+      Target:
+        Bucket: !Ref HelloBucket
+        ACL: "public-read"
+        Key: index.html
+        ContentType: text/html
+      Body: "3 - {{cfdemo.message}}"
+
+Outputs:
+  URL:
+    Description: The website url
+    Value: !Sub "http://${HelloBucket}.s3-website-${AWS::Region}.amazonaws.com/index.html"

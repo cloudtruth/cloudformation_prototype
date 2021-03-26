@@ -1,0 +1,37 @@
+Transform: S3Objects
+
+Parameters:
+  Environment:
+    Description: CloudTruth Environment
+    Type: String
+
+Mappings:
+  Fn::Transform:
+    Name: AWS::Include
+    Parameters:
+      Location: ./website-2-mappings.template
+
+Resources:
+
+  HelloBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join ["", [!FindInMap [ Configuration, !Ref Environment, cfdemobucket ], "-2"]]
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  HelloBucketIndex:
+    Type: AWS::S3::Object
+    Properties:
+      Target:
+        Bucket: !Ref HelloBucket
+        ACL: "public-read"
+        Key: index.html
+        ContentType: text/html
+      Body: !Join ["", ["2 - ", !FindInMap [ Configuration, !Ref Environment, cfdemomessage ]]]
+
+Outputs:
+  URL:
+    Description: The website url
+    Value: !Sub "http://${HelloBucket}.s3-website-${AWS::Region}.amazonaws.com/index.html"

@@ -1,0 +1,5 @@
+pkg/
+cloudtruth/.bundle
+cloudtruth/vendor
+*.log
+website-2-mappings.template

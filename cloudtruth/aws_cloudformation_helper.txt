@@ -1,0 +1,3 @@
+Temporarily including the gem into this repo to allow for data references
+against the resource (!GetAtt [CloudTruth, keyname]).  Should do a PR when we
+move past a prototype

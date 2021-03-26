@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'gem_logger'
+gem 'logging'
+gem 'activesupport'
+gem 'graphql-client'
+gem 'mustache'

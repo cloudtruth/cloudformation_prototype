@@ -1,0 +1,40 @@
+Transform: S3Objects
+
+Parameters:
+  Environment:
+    Description: CloudTruth Environment
+    Type: String
+
+Mappings:
+  Configuration:
+    development:
+      BucketName: ctdemo-cf-development-website-1
+      Message: 1 - Hello dev world!
+    production:
+      BucketName: ctdemo-cf-production-website-1
+      Message: 1 - Hello prod world!
+
+Resources:
+
+  HelloBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !FindInMap [ Configuration, !Ref Environment, BucketName ]
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  HelloBucketIndex:
+    Type: AWS::S3::Object
+    Properties:
+      Target:
+        Bucket: !Ref HelloBucket
+        ACL: "public-read"
+        Key: index.html
+        ContentType: text/html
+      Body: !FindInMap [ Configuration, !Ref Environment, Message ]
+
+Outputs:
+  URL:
+    Description: The website url
+    Value: !Sub "http://${HelloBucket}.s3-website-${AWS::Region}.amazonaws.com/index.html"
